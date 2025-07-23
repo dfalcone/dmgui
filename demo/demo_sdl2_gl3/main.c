@@ -40,7 +40,7 @@ static void UpdateDmgui() {
         // or put gui in separate thread from main
         int w,h;
         SDL_GetWindowSize(window, &w, &h);
-        viewportResolution = { (float)w, (float)h };
+        viewportResolution = (dmgui_floatv2_t){ (float)w, (float)h };
         dmguiSetViewportResolution(viewportResolution);
     }
 
@@ -83,7 +83,7 @@ int main()
 
     window = SDL_CreateWindow("dmgui demo_sdl2_gl3",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        1920, 1080,
+        (int)viewportResolution.x, (int)viewportResolution.y,
         SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
     if (!window) {
         printf("Error: Unable to create SDL window\n[%s]\n", SDL_GetError());
