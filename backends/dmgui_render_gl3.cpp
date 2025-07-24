@@ -5,7 +5,6 @@
 //#include "dmgui_render_gl3.h"
 #include "dmgui/dmgui_font.h"
 
-#include <algorithm>
 #include <assert.h>
 #include <stdio.h>
 
@@ -113,7 +112,6 @@ float bezierRayDistance(vec2 p, vec2 a, vec2 b, vec2 c, out int winding) {
 ivec2 texelCoord(int i) { return ivec2(i % c_maxTexDim, i / c_maxTexDim); }
 
 void main() {
-    bool isInside = false;
     int winding = 0;
     float minDist = 1e20; // sdf
     vec2 uv = fragUV * pxScale;
@@ -139,18 +137,6 @@ void main() {
     float antialiasing = fwidth(signedDist) * 0.5;
     float alpha = smoothstep(0.0 + antialiasing, 0.0 - antialiasing, signedDist);
     outColor = vec4(fragColor.rgb, fragColor.a * alpha);
-
-    //outColor = vec4(float(fragOffset) / 255.0, float(fragCount) / 255.0, 0.0, 1.0);
-
-    //outColor.a = 0.5;
-
-    //outColor = vec4(vec3(clamp(signedDist * 100.0 + 0.5, 0.0, 1.0)), 1.0);
-    //outColor = vec4(float(winding & 1), 0.0, 0.0, 1.0);
-
-    //int xxx = texelFetch(uSegmentsTex, ivec2(2,0),0).r;
-    //if (xxx == 44) outColor.a = 1;
-
-    if (fragCount == 0) outColor.a = 1;
 }
 )";
 
@@ -468,7 +454,7 @@ int dmguiUpdateRenderContextEnd(DmguiRenderContext* ctx,
         glClearColor(ctx->clearColor.r, ctx->clearColor.g, ctx->clearColor.b, ctx->clearColor.a);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         assert(!glGetError() && "glClear");
-    } 
+    }
     else {
         glClear(GL_DEPTH_BUFFER_BIT);
         assert(!glGetError() && "glClear");
