@@ -1,5 +1,7 @@
 #pragma once
 
+#include <assert.h>
+
 // minimal subset of OpenGL local to DMGUI
 // compatible with:
 // - GL 3.3 (Windows, MacOS, Linux, FreeBSD)
@@ -316,6 +318,7 @@ typedef GLenum (APIENTRYP PFNGLGETERRORPROC) (void);
 
 //namespace {
 struct DmguiGl {
+    alignas(64)
     // once
     PFNGLCREATESHADERPROC         glCreateShader         = 0;
     PFNGLDELETESHADERPROC         glDeleteShader         = 0;
@@ -375,7 +378,7 @@ struct DmguiGl {
     PFNGLGETERRORPROC             glGetError             = 0;
 
 };
-static alignas(64) DmguiGl _dmguiGl;
+static DmguiGl _dmguiGl;
 #endif // PC
 // ---------------
 
@@ -433,17 +436,25 @@ static bool dmguiLoadGl3() {
 #elif defined(__linux__) || defined(__unix__)
 #include <dlfcn.h>
 static void* glModule;
-static inline void* glGetProcAddress(const char* name) { return dlsym(glModule, name); }
+typedef void* (APIENTRYP PFNGLXGETPROCADDRESSPROC_PRIVATE)(const char*);
+static PFNGLXGETPROCADDRESSPROC_PRIVATE glxGetProcAddress;
+static inline void* glGetProcAddress(const char* name) {
+   void* ret = glxGetProcAddress(name);
+   return ret ? ret : dlsym(glModule, name);
+}
 static bool dmguiLoadGl3() {
     bool loaded =
-        (glModule = dlopen("libEGL.so.1", RTLD_LAZY | RTLD_LOCAL | RTLD_NOLOAD)) ? true :
         (glModule = dlopen("libGL.so.1", RTLD_LAZY | RTLD_LOCAL | RTLD_NOLOAD)) ? true :
         (glModule = dlopen("libGLX.so.0", RTLD_LAZY | RTLD_LOCAL | RTLD_NOLOAD)) ? true :
-        (glModule = dlopen("libEGL.so.1", RTLD_LAZY | RTLD_LOCAL)) ? true :
+        (glModule = dlopen("libEGL.so.1", RTLD_LAZY | RTLD_LOCAL | RTLD_NOLOAD)) ? true :
         (glModule = dlopen("libGL.so.1", RTLD_LAZY | RTLD_LOCAL)) ? true :
         (glModule = dlopen("libGLX.so.0", RTLD_LAZY | RTLD_LOCAL)) ? true :
+        (glModule = dlopen("libEGL.so.1", RTLD_LAZY | RTLD_LOCAL)) ? true :
         false;
+    assert(glModule && "failed to load libGL.so or equivalent");
     if (!loaded) return false;
+    glxGetProcAddress = (PFNGLXGETPROCADDRESSPROC_PRIVATE)dlsym(glModule, "glXGetProcAddressARB");
+    assert(glxGetProcAddress && "failed  to load glxGetProcAddress");
     return _dmguiLoadGl3FunctionPointers();
 }
 #elif defined(__ANDROID__)
@@ -460,6 +471,7 @@ opengl platform not_implemented
 static bool _dmguiLoadGl3FunctionPointers() {
     size_t failed = 0;
     failed |= (size_t)(_dmguiGl.glCreateShader         = (PFNGLCREATESHADERPROC        )glGetProcAddress("glCreateShader"        )) == 0;
+    assert(!failed && "gl func");
     failed |= (size_t)(_dmguiGl.glDeleteShader         = (PFNGLDELETESHADERPROC        )glGetProcAddress("glDeleteShader"        )) == 0;
     failed |= (size_t)(_dmguiGl.glShaderSource         = (PFNGLSHADERSOURCEPROC        )glGetProcAddress("glShaderSource"        )) == 0;
     failed |= (size_t)(_dmguiGl.glCompileShader        = (PFNGLCOMPILESHADERPROC       )glGetProcAddress("glCompileShader"       )) == 0;

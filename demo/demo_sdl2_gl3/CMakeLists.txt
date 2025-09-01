@@ -8,6 +8,7 @@ if (${CMAKE_GENERATOR} MATCHES "Visual Studio*")
 endif()
 
 set(Proj Demo_SDL2_GL3)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 project(${Proj})
 
 set(RenderBackend "gl3" CACHE STRING "" FORCE)
@@ -20,8 +21,13 @@ add_subdirectory("../../" "${CMAKE_CURRENT_BINARY_DIR}/Obj/DmGui")
 add_executable(${Proj} "main.c")
 target_link_libraries(${Proj} LINK_PUBLIC DmGui SDL2::SDL2)
 
+if (WIN32)
+    add_custom_command(TARGET ${Proj} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_RUNTIME_DLLS:${Proj}>" "$<TARGET_FILE_DIR:${Proj}>"
+    )
+endif()
+
 add_custom_command(TARGET ${Proj} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_RUNTIME_DLLS:${Proj}>" "$<TARGET_FILE_DIR:${Proj}>"
     COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different "${CMAKE_SOURCE_DIR}/../data" "$<TARGET_FILE_DIR:${Proj}>"
 )
 

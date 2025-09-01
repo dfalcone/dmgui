@@ -1,0 +1,2 @@
+CompileFlags:
+  CompilationDatabase: demo/demo_sdl2_gl3/build/ninja-gcc-debug

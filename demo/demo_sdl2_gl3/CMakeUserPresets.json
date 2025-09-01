@@ -1,0 +1,53 @@
+{
+  "version": 5,
+  "configurePresets": [
+    {
+      "name": "ninja-gcc-debug",
+      "displayName": "ninja-gcc-debug",
+      "description": "",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/ninja-gcc-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++"
+      }
+    },
+    {
+      "name": "ninja-gcc-release",
+      "displayName": "ninja-gcc-release",
+      "description": "",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/ninja-gcc-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_C_COMPILER": "gcc",
+        "CMAKE_CXX_COMPILER": "g++"
+      }
+    },
+    {
+      "name": "ninja-clang-release",
+      "displayName": "ninja-clang-release",
+      "description": "",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/ninja-clang-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    },
+    {
+      "name": "ninja-clang-debug",
+      "displayName": "ninja-clang-debug",
+      "description": "",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/ninja-clang-debug",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "clang",
+        "CMAKE_CXX_COMPILER": "clang++"
+      }
+    }
+  ]
+}

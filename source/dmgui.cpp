@@ -4,15 +4,17 @@
 #include "dmgui/dmgui.h"
 #include "dmgui/dmgui_font.h"
 #include <assert.h>
+#include <stdio.h>
+#include <string.h>
 
 #define DMGUI_OBJECT_FLAG_CONSUME       0x1     // whether it should consume input
 #define DMGUI_OBJECT_FLAG_MOVE          0x2     // whether it can be moved
 //#define DMGUI_OBJECT_FLAG_INTERSECT   0x4     // whether the input pos intersects bounds
-#define DMGUI_OBJECT_FLAG_BIND_PRESS    0x8     // 
-#define DMGUI_OBJECT_FLAG_BIND_RELEASE  0x10    // 
-#define DMGUI_OBJECT_FLAG_BIND_DRAG     0x20    // 
-#define DMGUI_OBJECT_FLAG_BIND_HOVER    0x40    // 
-#define DMGUI_OBJECT_FLAG_8             0x80    // 
+#define DMGUI_OBJECT_FLAG_BIND_PRESS    0x8     //
+#define DMGUI_OBJECT_FLAG_BIND_RELEASE  0x10    //
+#define DMGUI_OBJECT_FLAG_BIND_DRAG     0x20    //
+#define DMGUI_OBJECT_FLAG_BIND_HOVER    0x40    //
+#define DMGUI_OBJECT_FLAG_8             0x80    //
 
 // ----------------------------------------------------------------------------
 // Internal Components
@@ -727,7 +729,7 @@ void dmguiBeginChild() {
 
     // using anchor
     // drawPoint = bounds.min + anchor * bounds.size
-    
+
     // using anchor pos for padding dir
     // xDir = anchor.x < 0.5f ? 1.f : anchor.x > 0.5f ? -1.f : 0.f;
     // yDir = anchor.y < 0.5f ? 1.f : anchor.y > 0.5f ? -1.f : 0.f;
