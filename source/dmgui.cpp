@@ -962,6 +962,7 @@ void dmguiDrawObject(const DmguiObject* in) {
             buttonKey.button = com->bindButton;
             flags |= buttonKey.type;
             s_ctx->coms.bindings.emplace(buttonKey.val, com->bindCallback);
+            assert(in->id != nullptr && "id required for dmgui draw object with input binding");
             break;
         case DMGUI_COMPONENT_FLEX_CONTAINER:
             s_ctx->layout.isFlex = true;
