@@ -11,6 +11,7 @@ SDL_Window* window = 0;
 dmgui_context_t* gui = 0;
 dmgui_floatv2_t viewportResolution = { 1920, 1080 };
 dmgui_floatv2_t canvasResolution = { 1920, 1080 };
+dmgui_floatv2_t helloWorldRectPosDelta = { 0.f, 0.f };
 
 // font ids are a 0 based index
 enum {
@@ -23,7 +24,7 @@ static void CreateDmgui() {
     render.viewport = (dmgui_viewport_t){ 0.f, 0.f, 1.f, 1.f }; // entire window surface
     render.clearColor = (dmgui_fcolor_t){ .2f, .2f, .2f, 1.f }; // light grey
     DmguiParamCreateInputContext input;
-    input.consumeInputEvents = true;
+    input.consumeInputEvents = false;
     input.pumpEvents = true;
     gui = dmguiCreateContext(viewportResolution, canvasResolution, &render, &input);
     dmgui_font_t fontId = dmguiCreateFont("Ubuntu-Regular.ttf");
@@ -34,7 +35,13 @@ static void DestroyDmgui() {
     dmguiDestroyContext(gui);
 }
 
-static void UpdateDmgui() {
+static void OnHelloWorldRectDrag(dmgui_index_t idx, dmgui_floatv2_t posDelta)
+{
+    helloWorldRectPosDelta.x += posDelta.x;
+    helloWorldRectPosDelta.y += posDelta.y;
+}
+
+static bool UpdateDmgui() {
     {   // in case user resized
         // for realtime resizing move to thread event filter
         // or put gui in separate thread from main
@@ -45,7 +52,21 @@ static void UpdateDmgui() {
     }
 
     dmguiUpdateContextBegin();
-    {
+
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+        case SDL_QUIT:
+            return false;
+        case SDL_WINDOWEVENT:
+            switch (event.window.event) {
+            case SDL_WINDOWEVENT_CLOSE:
+                return false;
+            }
+        }
+    }
+
+    { // hello world text on solid fill rect
         DmguiTextComponent text = {0};
         text.text = "Hello World";
         text.textColor = (dmgui_color_t){ 0, 0, 0, 255 };
@@ -53,19 +74,23 @@ static void UpdateDmgui() {
         text.fontId = 0;
 
         DmguiComponent coms[] = {
-            { .type =  DMGUI_COMPONENT_FILL, .color = (dmgui_color_t){ 200, 100, 50, 255 } }
-            ,
-            { .type = DMGUI_COMPONENT_TEXT, .text = &text }
+            { .type = DMGUI_COMPONENT_FILL, .color = (dmgui_color_t){ 200, 100, 50, 255 } },
+            { .type = DMGUI_COMPONENT_TEXT, .text = &text },
+            { .type = DMGUI_COMPONENT_BIND_DRAG, .bindButton = 1, .bindCallbackDrag = OnHelloWorldRectDrag },
         };
 
         DmguiObject obj = { 0 };
-        obj.pos = (dmgui_floatv2_t){ 300.f, 300.f };
+        obj.id = "helloworld";
+        obj.pos = (dmgui_floatv2_t){ 300.f + helloWorldRectPosDelta.x, 300.f + helloWorldRectPosDelta.y };
         obj.size = (dmgui_floatv2_t){ 300.f, 300.f };
         obj.componentCount = sizeof(coms) / sizeof(DmguiComponent);
         obj.components = coms;
         dmguiDrawObject(&obj);
     }
+
     dmguiUpdateContextEnd();
+
+    return true;
 }
 
 int main()
@@ -101,25 +126,7 @@ int main()
 
     CreateDmgui();
 
-    int mainLoop = 1;
-    while (mainLoop) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-            case SDL_QUIT:
-                mainLoop = 0;
-                break;
-            case SDL_WINDOWEVENT:
-                switch (event.window.event) {
-                case SDL_WINDOWEVENT_CLOSE:
-                    mainLoop = 0;
-                    break;
-                }
-            }
-        }
-
-        UpdateDmgui();
-
+    while (UpdateDmgui()) {
         SDL_GL_SwapWindow(window);
     }
 
