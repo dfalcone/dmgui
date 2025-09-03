@@ -380,10 +380,7 @@ static void UpdateInteractables() {
                 moveParentIdx = (dmgui_index_t)-2;
                 continue;
             }
-            if (parentMoved)
-                moveParentIdx = objParentIdx;
-            if (selfMoved)
-                moveParentIdx = objParentIdx;
+            moveParentIdx = objParentIdx;
         }
 
         // translate the vertices
