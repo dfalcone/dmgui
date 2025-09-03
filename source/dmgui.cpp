@@ -38,7 +38,6 @@ struct VertexInfo
     uint32_t size : 8;
     VertexInfo* next;
 
-    //VertexInfo(uint32_t _off, uint32_t _cnt, uint32_t _sz, VertexInfo* _nxt) :  offset{_off}, count{_cnt}, size{_sz}, next(_nxt) {}
     VertexInfo(uint32_t _off, uint32_t _cnt, uint32_t _sz, VertexInfo* _nxt) :  offset{_off}, count{_cnt}, size{_sz}, next(_nxt) {}
 };
 
