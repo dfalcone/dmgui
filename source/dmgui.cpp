@@ -38,6 +38,7 @@ struct VertexInfo
     uint32_t size : 8;
     VertexInfo* next;
 
+    //VertexInfo(uint32_t _off, uint32_t _cnt, uint32_t _sz, VertexInfo* _nxt) :  offset{_off}, count{_cnt}, size{_sz}, next(_nxt) {}
     VertexInfo(uint32_t _off, uint32_t _cnt, uint32_t _sz, VertexInfo* _nxt) :  offset{_off}, count{_cnt}, size{_sz}, next(_nxt) {}
 };
 
@@ -311,7 +312,7 @@ static void UpdateInteractables() {
             }
         }
         // (unlikely)
-        else if ((flags & (DMGUI_OBJECT_FLAG_BIND_PRESS|DMGUI_OBJECT_FLAG_BIND_RELEASE|DMGUI_OBJECT_FLAG_BIND_HOVER))
+        else if ((flags & (DMGUI_OBJECT_FLAG_BIND_PRESS|DMGUI_OBJECT_FLAG_BIND_RELEASE|DMGUI_OBJECT_FLAG_BIND_HOVER|DMGUI_OBJECT_FLAG_BIND_DRAG))
             && IsPointInBounds(inputPos, s_ctx->coms.bounds[idx].min, s_ctx->coms.bounds[idx].max)) {
             consume = (flags & DMGUI_OBJECT_FLAG_CONSUME) != 0;
             const int hasOnPress = (flags & DMGUI_OBJECT_FLAG_BIND_PRESS) != 0;
@@ -380,7 +381,10 @@ static void UpdateInteractables() {
                 moveParentIdx = (dmgui_index_t)-2;
                 continue;
             }
-            moveParentIdx = objParentIdx;
+            if (parentMoved)
+                moveParentIdx = objParentIdx;
+            if (selfMoved)
+                moveParentIdx = objParentIdx;
         }
 
         // translate the vertices
@@ -842,9 +846,12 @@ void dmguiEndChild() {
 }
 
 static inline VertexInfo* GetVertexInfo(VertexInfo* p, uint32_t size) {
-    return p->size == size ? p :
-        &s_ctx->coms.vertexInfoNext.emplace_back(
-            (uint32_t)s_ctx->vertices.size(), 0, size, p);
+    if (p->size != size) {
+        p->next = &s_ctx->coms.vertexInfoNext.emplace_back(
+            (uint32_t)s_ctx->vertices.size(), 0, size, nullptr);
+        p = p->next;
+    }
+    return p;
 }
 
 void dmguiDrawObject(const DmguiObject* in) {
@@ -969,13 +976,13 @@ void dmguiDrawObject(const DmguiObject* in) {
             // option to clip out of bounds
             // option to grow bounds
             // option to justify text (move vertex positions based on text bounds vs obj bounds)
+            pVertInfo = GetVertexInfo(pVertInfo, sizeof(DmguiFontVertex));
             DmguiTextVertices vd = DrawText(
                 bounds,
                 com->text->text,
                 com->style ? s_style->fontSize[com->style] : com->text->fontSize,
                 com->style ? s_style->font[com->style] :com->text->fontId,
                 com->style ? s_style->fontColor[com->style] :com->text->textColor);
-            pVertInfo = GetVertexInfo(pVertInfo, sizeof(DmguiFontVertex));
             pVertInfo->count += vd.verticesCount;
             break; }
         default:
