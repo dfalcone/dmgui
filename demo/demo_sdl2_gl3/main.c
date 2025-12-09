@@ -80,7 +80,7 @@ static bool UpdateDmgui() {
         };
 
         DmguiObject obj = { 0 };
-        obj.id = "helloworld";
+        obj.id = (const dmgui_id_t*)"helloworld";
         obj.pos = (dmgui_floatv2_t){ 300.f + helloWorldRectPosDelta.x, 300.f + helloWorldRectPosDelta.y };
         obj.size = (dmgui_floatv2_t){ 300.f, 300.f };
         obj.componentCount = sizeof(coms) / sizeof(DmguiComponent);
