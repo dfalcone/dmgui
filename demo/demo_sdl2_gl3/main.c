@@ -80,7 +80,7 @@ static bool UpdateDmgui() {
         };
 
         DmguiObject obj = { 0 };
-        obj.id = "helloworld";
+        obj.id = (const dmgui_id_t*)"helloworld";
         obj.pos = (dmgui_floatv2_t){ 300.f + helloWorldRectPosDelta.x, 300.f + helloWorldRectPosDelta.y };
         obj.size = (dmgui_floatv2_t){ 300.f, 300.f };
         obj.componentCount = sizeof(coms) / sizeof(DmguiComponent);
@@ -109,7 +109,7 @@ int main()
     window = SDL_CreateWindow("dmgui demo_sdl2_gl3",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         (int)viewportResolution.x, (int)viewportResolution.y,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+        SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_SHOWN);
     if (!window) {
         printf("Error: Unable to create SDL window\n[%s]\n", SDL_GetError());
         return -1;
