@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 #if defined(__EMSCRIPTEN__)
-#define GLSL_VERSION_PRECISION "#version 300 es\n" "precision mediump float;"
+#define GLSL_VERSION_PRECISION "#version 300 es\n" "precision mediump float;\n"
 #else
 #define GLSL_VERSION_PRECISION "#version 330 core\n"
 #endif
